@@ -23,7 +23,7 @@ public class ChatClient {
         out = new PrintWriter(socket.getOutputStream(), true);
 
         // start a thread to listen for server messages
-        ClientServerHandler listener = new ClientServerHandler(socketIn);
+        ServerListener listener = new ServerListener();
         Thread t = new Thread(listener);
         t.start();
 
@@ -33,7 +33,13 @@ public class ChatClient {
 
         String line = userInput.nextLine().trim();
         while(!line.toLowerCase().startsWith("/quit")) {
-            String msg = String.format("CHAT %s", line); 
+            String msg;
+            if(line.startsWith("@")) {
+                msg = String.format("PCHAT %s", line);
+            }
+            else {
+                msg = String.format("CHAT %s", line);
+            }
             out.println(msg);
             line = userInput.nextLine().trim();
         }
@@ -42,6 +48,4 @@ public class ChatClient {
         userInput.close();
         socketIn.close();
         socket.close();
-        
-    }
 }
