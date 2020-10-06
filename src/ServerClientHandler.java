@@ -33,6 +33,17 @@ public class ServerClientHandler implements Runnable{
 
     }
 
+    public void privateBroadcast(String msg, ClientConnectionData c) {
+        try {
+            System.out.println("Private Broadcasting to " + c.getUserName() + " -- " + msg);
+            c.getOut().println(msg);
+        }
+        catch (Exception ex) {
+            System.out.println("broadcast caught exception: " + ex);
+            ex.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -53,7 +64,25 @@ public class ServerClientHandler implements Runnable{
                         String msg = String.format("CHAT %s %s", client.getUserName(), chat);
                         broadcast(msg);
                     }
-                } else if (incoming.startsWith("QUIT")){
+                }
+
+                else if(incoming.startsWith("PCHAT")) { // Start new
+                    String chat = incoming.substring(7).trim();
+                    int endOfUsernameIndex = chat.indexOf(" ");
+                    String pchatUsername = chat.substring(0, endOfUsernameIndex).trim();
+                    for (ClientConnectionData c: clientList) {
+                        if(pchatUsername.equals(c.getUserName())) {
+                            if(chat.substring(endOfUsernameIndex).trim().length() > 0) {
+                                String receiverMSG = String.format("PCHAT %s %s", client.getUserName(), chat.substring(endOfUsernameIndex).trim());
+                                String senderMSG = String.format("PCHAT %s %s", c.getUserName(), chat.substring(endOfUsernameIndex).trim());
+                                privateBroadcast(receiverMSG, c);
+                                privateBroadcast(senderMSG, client);
+                            }
+                        }
+                    }
+                }
+
+                else if (incoming.startsWith("QUIT")){
                     break;
                 }
             }

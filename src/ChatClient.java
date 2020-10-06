@@ -33,7 +33,13 @@ public class ChatClient {
 
         String line = userInput.nextLine().trim();
         while(!line.toLowerCase().startsWith("/quit")) {
-            String msg = String.format("CHAT %s", line); 
+            String msg;
+            if(line.startsWith("@")) {
+                msg = String.format("PCHAT %s", line);
+            }
+            else {
+                msg = String.format("CHAT %s", line);
+            }
             out.println(msg);
             line = userInput.nextLine().trim();
         }
