@@ -23,7 +23,7 @@ public class ChatClient {
         out = new PrintWriter(socket.getOutputStream(), true);
 
         // start a thread to listen for server messages
-        ServerListener listener = new ServerListener();
+        ServerClientHandler listener = new ServerClientHandler();
         Thread t = new Thread(listener);
         t.start();
 
