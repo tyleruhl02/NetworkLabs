@@ -22,7 +22,7 @@ public class ClientServerHandler implements Runnable{
         } catch (Exception ex) {
             System.out.println("Exception caught in listener - " + ex);
         } finally{
-            System.out.println("Client Listener exiting");
+            System.out.println("ClientServerHandler exiting");
         }
     }
 }

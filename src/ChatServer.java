@@ -34,6 +34,7 @@ public class ChatServer {
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                     String name = socket.getInetAddress().getHostName();
 
+
                     ClientConnectionData client = new ClientConnectionData(socket, in, out, name);
                     synchronized (clientList) {
                         clientList.add(client);

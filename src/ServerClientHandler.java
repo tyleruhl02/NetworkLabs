@@ -50,6 +50,23 @@ public class ServerClientHandler implements Runnable{
             BufferedReader in = client.getInput();
             //get userName, first message from user
             String userName = in.readLine().trim();
+            Boolean uniqueUserName = false;
+
+            // checks that username is unique
+
+            while(!uniqueUserName) {
+                for (int i = 0; i < clientList.size(); i++) {
+                    if (clientList.get(i).getUserName().equals(userName) || !userName.matches("^[a-zA-Z0-9]*$")) {
+                        System.out.print("Sorry that user name is taken, please enter another username.");
+                        userName = in.readLine().trim();
+                        break;
+                    }
+
+                    if(i == clientList.size()-1){
+                        uniqueUserName = true;
+                    }
+                }
+            }
             client.setUserName(userName);
             //notify all that client has joined
             broadcast(String.format("WELCOME %s", client.getUserName()));

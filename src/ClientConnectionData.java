@@ -14,6 +14,7 @@ public class ClientConnectionData {
         this.input = input;
         this.out = out;
         this.name = name;
+        this.userName = "";
     }
 
     public Socket getSocket() {
