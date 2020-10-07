@@ -50,20 +50,21 @@ public class ServerClientHandler implements Runnable{
             BufferedReader in = client.getInput();
             //get userName, first message from user
             String userName = in.readLine().trim();
-            Boolean uniqueUserName = false;
+            Boolean validUserName = false;
 
             // checks that username is unique
 
-            while(!uniqueUserName) {
+            while(!validUserName) {
                 for (int i = 0; i < clientList.size(); i++) {
-                    if (clientList.get(i).getUserName().equals(userName) || !userName.matches("^[a-zA-Z0-9]*$")) {
-                        System.out.print("Sorry that user name is taken, please enter another username.");
-                        userName = in.readLine().trim();
+                    if (clientList.get(i).getUserName().equals(userName) || !userName.matches("^[a-zA-Z0-9]*$")
+                            || userName.length() == 0) {
+                        privateBroadcast("Sorry that user name is either taken or invalid, please enter another username.", client);
+                        userName = in.readLine().trim().substring(5);
                         break;
                     }
 
                     if(i == clientList.size()-1){
-                        uniqueUserName = true;
+                        validUserName = true;
                     }
                 }
             }
@@ -97,6 +98,16 @@ public class ServerClientHandler implements Runnable{
                             }
                         }
                     }
+                }
+
+                else if (incoming.startsWith("Die Roll: ")){
+                    String msg = client.getUserName() + "'s " + incoming.trim();
+                    broadcast(msg);
+                }
+
+                else if (incoming.startsWith("Coin Flip: ")){
+                    String msg = client.getUserName() + "'s " + incoming.trim();
+                    broadcast(msg);
                 }
 
                 else if (incoming.startsWith("QUIT")){

@@ -37,6 +37,19 @@ public class ChatClient {
             if(line.startsWith("@")) {
                 msg = String.format("PCHAT %s", line);
             }
+            else if(line.startsWith("/rollDie")){
+                msg = "Die Roll: " +  (int)(Math.random() * 6 + 1);
+
+            }
+            else if(line.startsWith("/flipCoin")){
+                int temp = (int)Math.random() * 2;
+                if(temp == 0){
+                    msg = "Coin Flip: Heads";
+                }
+                else{
+                    msg = "Coin Flip: Tails";
+                }
+            }
             else {
                 msg = String.format("CHAT %s", line);
             }

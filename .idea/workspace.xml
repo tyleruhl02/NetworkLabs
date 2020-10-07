@@ -3,13 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="91280185-441d-4f67-b871-622521faeba4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sprint-lab/ChatServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/sprint-lab/ChatServer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sprint-lab/ClientConnectionData.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/sprint-lab/ClientConnectionData.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sprint-lab/ClientServerHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/sprint-lab/ClientServerHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/sprint-lab/ChatClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/sprint-lab/ChatClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/sprint-lab/ServerClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/sprint-lab/ServerClientHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ClientConnectionData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientConnectionData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ClientServerHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientServerHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ServerClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ServerClientHandler.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -24,11 +20,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="49" column="23" selection-start-line="49" selection-start-column="23" selection-end-line="49" selection-end-column="23" />
+            <state relative-caret-position="361">
+              <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -36,8 +32,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="35" selection-start-line="35" selection-end-line="35" />
+            <state relative-caret-position="127">
+              <caret line="27" column="11" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -45,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ClientServerHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="19" column="32" selection-start-line="19" selection-start-column="32" selection-end-line="19" selection-end-column="32" />
+            <state relative-caret-position="391">
+              <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
               <folding>
                 <element signature="e#171#172#0" expanded="true" />
                 <element signature="e#211#212#0" expanded="true" />
@@ -55,11 +51,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ServerClientHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="59" column="23" selection-start-line="59" selection-start-column="23" selection-end-line="59" selection-end-column="23" />
+            <state relative-caret-position="1870">
+              <caret line="110" column="17" selection-start-line="110" selection-start-column="17" selection-end-line="110" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,13 +78,19 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/ChatClient.java" />
         <option value="$PROJECT_DIR$/src/ChatServer.java" />
         <option value="$PROJECT_DIR$/src/ClientServerHandler.java" />
         <option value="$PROJECT_DIR$/src/ClientConnectionData.java" />
+        <option value="$PROJECT_DIR$/src/ChatClient.java" />
         <option value="$PROJECT_DIR$/src/ServerClientHandler.java" />
       </list>
     </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand />
+      <select />
+    </treeState>
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
@@ -100,6 +102,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -117,7 +120,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -189,17 +191,21 @@
       <workItem from="1602011555360" duration="673000" />
       <workItem from="1602015084811" duration="5316000" />
       <workItem from="1602031982861" duration="54000" />
+      <workItem from="1602032100490" duration="1752000" />
+      <workItem from="1602034373513" duration="172000" />
+      <workItem from="1602037995391" duration="2543000" />
+      <workItem from="1602040620335" duration="138000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7925000" />
+    <option name="totallyTimeSpent" value="12530000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="827" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27110156" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.28540772" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -216,7 +222,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.3292517" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.3292517" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Messages" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -225,7 +231,7 @@
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info anchor="right" id="Maven" order="6" />
+      <window_info anchor="right" id="Maven" order="6" weight="0.3297568" />
       <window_info anchor="right" id="Capture Analysis" order="7" />
       <window_info anchor="right" id="Palette&#9;" order="8" />
     </layout>
@@ -245,24 +251,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="49" column="23" selection-start-line="49" selection-start-column="23" selection-end-line="49" selection-end-column="23" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/debugger.renderers.xml">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="35" selection-start-line="35" selection-end-line="35" />
+        <state relative-caret-position="127">
+          <caret line="27" column="11" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ClientServerHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="32" selection-start-line="19" selection-start-column="32" selection-end-line="19" selection-end-column="32" />
+        <state relative-caret-position="391">
+          <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
           <folding>
             <element signature="e#171#172#0" expanded="true" />
             <element signature="e#211#212#0" expanded="true" />
@@ -272,11 +274,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ServerClientHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="59" column="23" selection-start-line="59" selection-start-column="23" selection-end-line="59" selection-end-column="23" />
+        <state relative-caret-position="1870">
+          <caret line="110" column="17" selection-start-line="110" selection-start-column="17" selection-end-line="110" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="30" />
         </state>
       </provider>
     </entry>
