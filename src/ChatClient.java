@@ -23,7 +23,7 @@ public class ChatClient {
         out = new PrintWriter(socket.getOutputStream(), true);
 
         // start a thread to listen for server messages
-        ClientServerHandler listener = new ClientServerHandler(socketIn);
+        ServerClientHandler listener = new ServerClientHandler();
         Thread t = new Thread(listener);
         t.start();
 
@@ -37,6 +37,7 @@ public class ChatClient {
             if(line.startsWith("@")) {
                 msg = String.format("PCHAT %s", line);
             }
+
             else if(line.startsWith("/rollDie")){
                 msg = "Die Roll: " +  (int)(Math.random() * 6 + 1);
 
@@ -50,6 +51,8 @@ public class ChatClient {
                     msg = "Coin Flip: Tails";
                 }
             }
+
+
             else {
                 msg = String.format("CHAT %s", line);
             }
@@ -61,6 +64,4 @@ public class ChatClient {
         userInput.close();
         socketIn.close();
         socket.close();
-        
-    }
 }
