@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 public class ChatServer {
-    public static final int PORT = 54322;
+    public static final int PORT = 54321;
     private static final ArrayList<ClientConnectionData> clientList = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {

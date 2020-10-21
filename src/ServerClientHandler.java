@@ -87,14 +87,28 @@ public class ServerClientHandler implements Runnable{
                 else if(incoming.startsWith("PCHAT")) { // Start new
                     String chat = incoming.substring(7).trim();
                     int endOfUsernameIndex = chat.indexOf(" ");
-                    String pchatUsername = chat.substring(0, endOfUsernameIndex).trim();
+
+                    ArrayList<String> pchatUsername = new ArrayList<String>();
+                    pchatUsername.add(chat.substring(0, endOfUsernameIndex).trim());
+                    chat = chat.substring(endOfUsernameIndex).trim();
+
+                    while(chat.startsWith("@")){
+                        endOfUsernameIndex = chat.indexOf(" ");
+                        pchatUsername.add(chat.substring(1, endOfUsernameIndex));
+                        chat = chat.substring(endOfUsernameIndex).trim();
+                    }
+
+
                     for (ClientConnectionData c: clientList) {
-                        if(pchatUsername.equals(c.getUserName())) {
-                            if(chat.substring(endOfUsernameIndex).trim().length() > 0) {
-                                String receiverMSG = String.format("PCHAT %s %s", client.getUserName(), chat.substring(endOfUsernameIndex).trim());
-                                String senderMSG = String.format("PCHAT %s %s", c.getUserName(), chat.substring(endOfUsernameIndex).trim());
-                                privateBroadcast(receiverMSG, c);
-                                privateBroadcast(senderMSG, client);
+                        for(int i = 0; i < pchatUsername.size(); i++) {
+                            if (pchatUsername.get(i).equals(c.getUserName())) {
+                                if (chat.length() > 0) {
+                                    String receiverMSG = String.format("PCHAT %s %s", client.getUserName(), chat);
+                                    String senderMSG = String.format("PCHAT %s %s", c.getUserName(), chat);
+                                    privateBroadcast(receiverMSG, c);
+                                    privateBroadcast(senderMSG, client);
+
+                                }
                             }
                         }
                     }
