@@ -72,6 +72,11 @@ public class ServerClientHandler implements Runnable{
             //notify all that client has joined
             broadcast(String.format("WELCOME %s", client.getUserName()));
 
+            privateBroadcast("Current Members in server:", client);
+            for(int i = 0; i < clientList.size(); i++){
+                privateBroadcast(clientList.get(i).getUserName(), client);
+            }
+
 
             String incoming = "";
 
@@ -122,6 +127,13 @@ public class ServerClientHandler implements Runnable{
                 else if (incoming.startsWith("Coin Flip: ")){
                     String msg = client.getUserName() + "'s " + incoming.trim();
                     broadcast(msg);
+                }
+
+                else if (incoming.startsWith("WhoIsHere")){
+                    privateBroadcast("Current Members in server:", client);
+                    for(int i = 0; i < clientList.size(); i++){
+                        privateBroadcast(clientList.get(i).getUserName(), client);
+                    }
                 }
 
                 else if (incoming.startsWith("QUIT")){

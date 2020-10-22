@@ -41,6 +41,9 @@ public class ChatClient {
                 msg = "Die Roll: " +  (int)(Math.random() * 6 + 1);
 
             }
+            else if(line.startsWith("/whoishere")){
+                msg = "WhoIsHere";
+            }
             else if(line.startsWith("/flipCoin")){
                 int temp = (int)Math.random() * 2;
                 if(temp == 0){
