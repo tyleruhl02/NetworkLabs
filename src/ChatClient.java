@@ -1,13 +1,15 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ChatClient {
     private static Socket socket;
     private static BufferedReader socketIn;
-    private static PrintWriter out;
+    private static ObjectOutputStream out;
 
     public static void main(String[] args) throws Exception {
         Scanner userInput = new Scanner(System.in);
@@ -20,7 +22,7 @@ public class ChatClient {
 
         socket = new Socket(serverip, port);
         socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
+        out = new ObjectOutputStream(socket.getOutputStream());
 
         // start a thread to listen for server messages
         ClientServerHandler listener = new ClientServerHandler(socketIn);
@@ -29,41 +31,31 @@ public class ChatClient {
 
         System.out.print("Chat sessions has started - enter a user name: ");
         String name = userInput.nextLine().trim();
-        out.println(name); //out.flush();
+        out.writeObject(name); //out.flush();
 
         String line = userInput.nextLine().trim();
-        while(!line.toLowerCase().startsWith("/quit")) {
-            String msg;
-            if(line.startsWith("@")) {
-                msg = String.format("PCHAT %s", line);
+        while (!line.toLowerCase().startsWith("/quit")) {
+            Serialization m;
+            if (line.startsWith("@")) {
+                m = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, line);
+            } else if(line.startsWith("Die Roll:")) {
+                m = new Serialization(Serialization.MSG_HEADER_DIEROLL, line);
+            } else if(line.startsWith("Coin Flip:"))  {
+                m = new Serialization(Serialization.MSG_HEADER_COINFLIP, line);
+            } else if(line.startsWith("WhoIsHere")) {
+                m = new Serialization(Serialization.MSG_HEADER_WHOISHERE, line);
+            } else {
+                m = new Serialization(Serialization.MSG_HEADER_CHAT, line);
             }
-            else if(line.startsWith("/rollDie")){
-                msg = "Die Roll: " +  (int)(Math.random() * 6 + 1);
-
-            }
-            else if(line.startsWith("/whoishere")){
-                msg = "WhoIsHere";
-            }
-            else if(line.startsWith("/flipCoin")){
-                int temp = (int)Math.random() * 2;
-                if(temp == 0){
-                    msg = "Coin Flip: Heads";
-                }
-                else{
-                    msg = "Coin Flip: Tails";
-                }
-            }
-            else {
-                msg = String.format("CHAT %s", line);
-            }
-            out.println(msg);
+            out.writeObject(m);
+            System.out.println(m);
             line = userInput.nextLine().trim();
         }
-        out.println("QUIT");
+        //System.out.println();
+        out.writeObject(new Serialization(Serialization.MSG_HEADER_QUIT, ""));
         out.close();
         userInput.close();
         socketIn.close();
         socket.close();
-
     }
 }

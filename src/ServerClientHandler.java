@@ -1,5 +1,7 @@
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.SocketException;
 import java.util.ArrayList;
 
@@ -47,9 +49,9 @@ public class ServerClientHandler implements Runnable{
     @Override
     public void run() {
         try {
-            BufferedReader in = client.getInput();
+            ObjectInputStream in = new ObjectInputStream(client.getSocket().getInputStream());
             //get userName, first message from user
-            String userName = in.readLine().trim();
+            String userName = ((String)in.readObject()).trim();
             Boolean validUserName = false;
 
             // checks that username is unique
@@ -59,7 +61,7 @@ public class ServerClientHandler implements Runnable{
                     if (clientList.get(i).getUserName().equals(userName) || !userName.matches("^[a-zA-Z0-9]*$")
                             || userName.length() == 0) {
                         privateBroadcast("Sorry that user name is either taken or invalid, please enter another username.", client);
-                        userName = in.readLine().trim().substring(5);
+                        userName = ((String)in.readObject()).trim().substring(5);
                         break;
                     }
 
@@ -77,24 +79,29 @@ public class ServerClientHandler implements Runnable{
                 privateBroadcast(clientList.get(i).getUserName(), client);
             }
 
+            Serialization incoming;
+            //incoming = (Serialization) in.readObject();
 
-            String incoming = "";
+            //System.out.println(incoming);
 
-            while( (incoming = in.readLine()) != null) {
-                if (incoming.startsWith("CHAT")) {
-                    String chat = incoming.substring(4).trim();
+            while( (incoming = (Serialization) in.readObject()) != null) {
+                if(incoming.getMsgHeader() == Serialization.MSG_HEADER_CHAT) {
+                    //String chat = incoming.getMsg().substring(4).trim();
+                    String chat = incoming.getMsg().trim();
                     if (chat.length() > 0) {
                         String msg = String.format("CHAT %s %s", client.getUserName(), chat);
                         broadcast(msg);
                     }
                 }
 
-                else if(incoming.startsWith("PCHAT")) { // Start new
-                    String chat = incoming.substring(7).trim();
+                //else if(incoming.startsWith("PCHAT")) { // Start new
+                else if(incoming.getMsgHeader() == Serialization.MSG_HEADER_PRIVATECHAT) {
+                    //String chat = incoming.getMsg().substring(7).trim();
+                    String chat = incoming.getMsg().trim();
                     int endOfUsernameIndex = chat.indexOf(" ");
 
                     ArrayList<String> pchatUsername = new ArrayList<String>();
-                    pchatUsername.add(chat.substring(0, endOfUsernameIndex).trim());
+                    pchatUsername.add(chat.substring(1, endOfUsernameIndex).trim());
                     chat = chat.substring(endOfUsernameIndex).trim();
 
                     while(chat.startsWith("@")){
@@ -102,7 +109,6 @@ public class ServerClientHandler implements Runnable{
                         pchatUsername.add(chat.substring(1, endOfUsernameIndex));
                         chat = chat.substring(endOfUsernameIndex).trim();
                     }
-
 
                     for (ClientConnectionData c: clientList) {
                         for(int i = 0; i < pchatUsername.size(); i++) {
@@ -119,24 +125,24 @@ public class ServerClientHandler implements Runnable{
                     }
                 }
 
-                else if (incoming.startsWith("Die Roll: ")){
-                    String msg = client.getUserName() + "'s " + incoming.trim();
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_DIEROLL){
+                    String msg = client.getUserName() + "'s " + incoming.getMsg().trim();
                     broadcast(msg);
                 }
 
-                else if (incoming.startsWith("Coin Flip: ")){
-                    String msg = client.getUserName() + "'s " + incoming.trim();
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_COINFLIP){
+                    String msg = client.getUserName() + "'s " + incoming.getMsg().trim();
                     broadcast(msg);
                 }
 
-                else if (incoming.startsWith("WhoIsHere")){
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_WHOISHERE){
                     privateBroadcast("Current Members in server:", client);
                     for(int i = 0; i < clientList.size(); i++){
                         privateBroadcast(clientList.get(i).getUserName(), client);
                     }
                 }
 
-                else if (incoming.startsWith("QUIT")){
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_QUIT){
                     break;
                 }
             }
