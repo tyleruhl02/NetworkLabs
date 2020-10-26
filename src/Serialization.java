@@ -9,6 +9,7 @@ public class Serialization implements Serializable {
     public static final int MSG_HEADER_COINFLIP = 3;
     public static final int MSG_HEADER_WHOISHERE = 4;
     public static final int MSG_HEADER_QUIT = 5;
+    public static final int MSG_HEADER_OTHER = 6;
 
     private int msgHeader;
     private String msg;

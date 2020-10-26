@@ -1,3 +1,4 @@
+import java.io.*;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -5,10 +6,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 
 public class ChatServer {
     public static final int PORT = 54321;
@@ -31,7 +28,7 @@ public class ChatServer {
 
                     // This code should really be done in the separate thread
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                     String name = socket.getInetAddress().getHostName();
 
 

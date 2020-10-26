@@ -19,12 +19,12 @@ public class ServerClientHandler implements Runnable{
     /**
      * Broadcasts a message to all clients connected to the server.
      */
-    public void broadcast(String msg) {
+    public void broadcast(Serialization msg) {
         try {
-            System.out.println("Broadcasting -- " + msg);
+            System.out.println("Broadcasting -- " + msg.getMsg());
             synchronized (clientList) {
                 for (ClientConnectionData c : clientList){
-                    c.getOut().println(msg);
+                    c.getOut().writeObject(msg);
                     // c.getOut().flush();
                 }
             }
@@ -35,15 +35,27 @@ public class ServerClientHandler implements Runnable{
 
     }
 
-    public void privateBroadcast(String msg, ClientConnectionData c) {
+    public void privateBroadcast(Serialization msg, ClientConnectionData c) {
         try {
             System.out.println("Private Broadcasting to " + c.getUserName() + " -- " + msg);
-            c.getOut().println(msg);
+            c.getOut().writeObject(msg);
         }
         catch (Exception ex) {
             System.out.println("broadcast caught exception: " + ex);
             ex.printStackTrace();
         }
+    }
+
+    public void whoIsHere(ClientConnectionData c) {
+        Serialization temp = new Serialization(Serialization.MSG_HEADER_OTHER, "Current Members in server:");
+        privateBroadcast(temp, client);
+        String list = "";
+        for(int i = 0; i < clientList.size(); i++){
+            list = list + clientList.get(i).getUserName() + " ";
+        }
+        temp = new Serialization(Serialization.MSG_HEADER_WHOISHERE, list);
+        System.out.println(list);
+        privateBroadcast(temp, client);
     }
 
     @Override
@@ -62,7 +74,8 @@ public class ServerClientHandler implements Runnable{
                 for (int i = 0; i < clientList.size(); i++) {
                     if (clientList.get(i).getUserName().equals(userName) || !userName.matches("^[a-zA-Z0-9]*$")
                             || userName.length() == 0) {
-                        privateBroadcast("Sorry that user name is either taken or invalid, please enter another username.", client);
+                        Serialization temp = new Serialization(Serialization.MSG_HEADER_OTHER, "Sorry that user name is either taken or invalid, please enter another username.");
+                        privateBroadcast(temp, client);
                         userName = ((Serialization)in.readObject()).getMsg().trim();
                         break;
                     }
@@ -74,27 +87,23 @@ public class ServerClientHandler implements Runnable{
             }
             client.setUserName(userName);
             //notify all that client has joined
-            broadcast(String.format("WELCOME %s", client.getUserName()));
+            Serialization temp = new Serialization(Serialization.MSG_HEADER_OTHER, String.format("WELCOME %s", client.getUserName()));
+            broadcast(temp);
 
-            privateBroadcast("Current Members in server:", client);
-            for(int i = 0; i < clientList.size(); i++){
-                privateBroadcast(clientList.get(i).getUserName(), client);
-            }
+            whoIsHere(client);
             //incoming = (Serialization) in.readObject();
 
             //System.out.println(incoming);
 
             while( (incoming = (Serialization) in.readObject()) != null) {
                 if(incoming.getMsgHeader() == Serialization.MSG_HEADER_CHAT) {
-                    //String chat = incoming.getMsg().substring(4).trim();
                     String chat = incoming.getMsg().trim();
                     if (chat.length() > 0) {
-                        String msg = String.format("CHAT %s %s", client.getUserName(), chat);
-                        broadcast(msg);
+                        String msg = String.format("%s %s", client.getUserName(), chat);
+                        broadcast(new Serialization(Serialization.MSG_HEADER_CHAT, msg));
                     }
                 }
 
-                //else if(incoming.startsWith("PCHAT")) { // Start new
                 else if(incoming.getMsgHeader() == Serialization.MSG_HEADER_PRIVATECHAT) {
                     //String chat = incoming.getMsg().substring(7).trim();
                     String chat = incoming.getMsg().trim();
@@ -114,11 +123,10 @@ public class ServerClientHandler implements Runnable{
                         for(int i = 0; i < pchatUsername.size(); i++) {
                             if (pchatUsername.get(i).equals(c.getUserName())) {
                                 if (chat.length() > 0) {
-                                    String receiverMSG = String.format("PCHAT %s %s", client.getUserName(), chat);
-                                    String senderMSG = String.format("PCHAT %s %s", c.getUserName(), chat);
-                                    privateBroadcast(receiverMSG, c);
-                                    privateBroadcast(senderMSG, client);
-
+                                        System.out.println(chat);
+                                        temp = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, String.format("%s %s %s", client.getUserName(), c.getUserName(), chat));
+                                        privateBroadcast(temp, c);
+                                        privateBroadcast(temp, client);
                                 }
                             }
                         }
@@ -127,26 +135,23 @@ public class ServerClientHandler implements Runnable{
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_DIEROLL){
                     int roll =  (int) ((Math.random()*6)+1);
-                    String msg = client.getUserName() + "'s" + " die roll: " + roll;
-                    broadcast(msg);
+                    String msg = client.getUserName() + "'s" + " DIE ROLL: " + roll;
+                    broadcast(new Serialization(Serialization.MSG_HEADER_DIEROLL, msg));
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_COINFLIP){
                     int rand = (int) ((Math.random()*2)+1);
                     String msg = "";
                     if(rand == 1) {
-                        msg = client.getUserName() + "'s " + "coin flip: Heads";
+                        msg = client.getUserName() + "'s " + "COIN FLIP: HEADS";
                     } else if (rand == 2) {
-                        msg = client.getUserName() + "'s " + "coin flip: tails";
+                        msg = client.getUserName() + "'s " + "COIN FLIP: TAILS";
                     }
-                    broadcast(msg);
+                    broadcast(new Serialization(Serialization.MSG_HEADER_COINFLIP, msg));
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_WHOISHERE){
-                    privateBroadcast("Current Members in server:", client);
-                    for(int i = 0; i < clientList.size(); i++){
-                        privateBroadcast(clientList.get(i).getUserName(), client);
-                    }
+                    whoIsHere(client);
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_QUIT){
@@ -167,7 +172,7 @@ public class ServerClientHandler implements Runnable{
                 clientList.remove(client);
             }
             System.out.println(client.getName() + " has left.");
-            broadcast(String.format("EXIT %s", client.getUserName()));
+            broadcast(new Serialization(Serialization.MSG_HEADER_CHAT, String.format("EXIT %s", client.getUserName())));
             try {
                 client.getSocket().close();
             } catch (IOException ex) {}

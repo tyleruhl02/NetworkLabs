@@ -1,14 +1,11 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ChatClient {
     private static Socket socket;
-    private static BufferedReader socketIn;
+    private static ObjectInputStream socketIn;
     private static ObjectOutputStream out;
 
     public static void main(String[] args) throws Exception {
@@ -21,7 +18,7 @@ public class ChatClient {
         userInput.nextLine();
 
         socket = new Socket(serverip, port);
-        socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        socketIn = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
 
         // start a thread to listen for server messages
@@ -38,9 +35,9 @@ public class ChatClient {
             Serialization m;
             if (line.startsWith("@")) {
                 m = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, line);
-            } else if(line.startsWith("/rollDie")) {
+            } else if(line.startsWith("/rolldie")) {
                 m = new Serialization(Serialization.MSG_HEADER_DIEROLL, line);
-            } else if(line.startsWith("/flipCoin"))  {
+            } else if(line.startsWith("/flipcoin"))  {
                 m = new Serialization(Serialization.MSG_HEADER_COINFLIP, line);
             } else if(line.startsWith("/whoishere")) {
                 m = new Serialization(Serialization.MSG_HEADER_WHOISHERE, line);

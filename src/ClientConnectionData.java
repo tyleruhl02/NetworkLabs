@@ -1,15 +1,16 @@
 import java.io.BufferedReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientConnectionData {
     private Socket socket;
     private BufferedReader input;
-    private PrintWriter out;
+    private ObjectOutputStream out;
     private String name;
     private String userName;
 
-    public ClientConnectionData(Socket socket, BufferedReader input, PrintWriter out, String name) {
+    public ClientConnectionData(Socket socket, BufferedReader input, ObjectOutputStream out, String name) {
         this.socket = socket;
         this.input = input;
         this.out = out;
@@ -33,11 +34,11 @@ public class ClientConnectionData {
         this.input = input;
     }
 
-    public PrintWriter getOut() {
+    public ObjectOutputStream getOut() {
         return out;
     }
 
-    public void setOut(PrintWriter out) {
+    public void setOut(ObjectOutputStream out) {
         this.out = out;
     }
 

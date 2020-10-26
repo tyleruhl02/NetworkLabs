@@ -1,23 +1,60 @@
 import java.io.BufferedReader;
+import java.io.ObjectInputStream;
 
 public class ClientServerHandler implements Runnable{
-    BufferedReader socketIn;
+    ObjectInputStream socketIn;
 
-    public ClientServerHandler(BufferedReader socketIn){
+    public ClientServerHandler(ObjectInputStream socketIn){
         this.socketIn = socketIn;
     }
 
     @Override
     public void run() {
         try {
-            String incoming = "";
+            Serialization incoming;
 
-            while( (incoming = socketIn.readLine()) != null) {
+            while((incoming = (Serialization) socketIn.readObject()) != null) {
                 //handle different headers
                 //WELCOME
                 //CHAT
                 //EXIT
-                System.out.println(incoming);
+                String msg = incoming.getMsg();
+                if(incoming.getMsgHeader() == Serialization.MSG_HEADER_CHAT) {
+                    msg = msg.substring(0, msg.indexOf(" ")).trim() + " says: " + msg.substring(msg.indexOf(" ")).trim();
+                    System.out.println(msg);
+                }
+
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_PRIVATECHAT) {
+                    String firstUsername = msg.substring(0, msg.indexOf(" "));
+                    msg = msg.substring(msg.indexOf(" ")).trim();
+                    String secondUsername = msg.substring(0, msg.indexOf(" "));
+                    msg = msg.substring(msg.indexOf(" ")).trim();
+                    System.out.println(firstUsername + " says to " + secondUsername + ": " + msg);
+                }
+
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_DIEROLL) {
+                    System.out.println(msg);
+                }
+
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_COINFLIP) {
+                    System.out.println(msg);
+                }
+
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_WHOISHERE) {
+                    String[] chat = incoming.getMsg().trim().split(" ");
+                    for (int i = 0; i < chat.length; i++){
+                        System.out.println(chat[i]);
+                    }
+                }
+
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_OTHER) {
+                    System.out.println(msg);
+                }
+
+                else {
+                    System.out.println("Invalid Message Header.");
+                }
+                //System.out.println(incoming.getMsg());
             }
         } catch (Exception ex) {
             System.out.println("Exception caught in listener - " + ex);
