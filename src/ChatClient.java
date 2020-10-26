@@ -31,24 +31,23 @@ public class ChatClient {
 
         System.out.print("Chat sessions has started - enter a user name: ");
         String name = userInput.nextLine().trim();
-        out.writeObject(name); //out.flush();
+        out.writeObject(new Serialization(Serialization.MSG_HEADER_CHAT, name)); //out.flush();
 
         String line = userInput.nextLine().trim();
         while (!line.toLowerCase().startsWith("/quit")) {
             Serialization m;
             if (line.startsWith("@")) {
                 m = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, line);
-            } else if(line.startsWith("Die Roll:")) {
+            } else if(line.startsWith("/rollDie")) {
                 m = new Serialization(Serialization.MSG_HEADER_DIEROLL, line);
-            } else if(line.startsWith("Coin Flip:"))  {
+            } else if(line.startsWith("/flipCoin"))  {
                 m = new Serialization(Serialization.MSG_HEADER_COINFLIP, line);
-            } else if(line.startsWith("WhoIsHere")) {
+            } else if(line.startsWith("/whoishere")) {
                 m = new Serialization(Serialization.MSG_HEADER_WHOISHERE, line);
             } else {
                 m = new Serialization(Serialization.MSG_HEADER_CHAT, line);
             }
             out.writeObject(m);
-            System.out.println(m);
             line = userInput.nextLine().trim();
         }
         //System.out.println();

@@ -51,7 +51,9 @@ public class ServerClientHandler implements Runnable{
         try {
             ObjectInputStream in = new ObjectInputStream(client.getSocket().getInputStream());
             //get userName, first message from user
-            String userName = ((String)in.readObject()).trim();
+            Serialization incoming;
+
+            String userName = ((Serialization)in.readObject()).getMsg().trim();
             Boolean validUserName = false;
 
             // checks that username is unique
@@ -61,7 +63,7 @@ public class ServerClientHandler implements Runnable{
                     if (clientList.get(i).getUserName().equals(userName) || !userName.matches("^[a-zA-Z0-9]*$")
                             || userName.length() == 0) {
                         privateBroadcast("Sorry that user name is either taken or invalid, please enter another username.", client);
-                        userName = ((String)in.readObject()).trim().substring(5);
+                        userName = ((Serialization)in.readObject()).getMsg().trim();
                         break;
                     }
 
@@ -78,8 +80,6 @@ public class ServerClientHandler implements Runnable{
             for(int i = 0; i < clientList.size(); i++){
                 privateBroadcast(clientList.get(i).getUserName(), client);
             }
-
-            Serialization incoming;
             //incoming = (Serialization) in.readObject();
 
             //System.out.println(incoming);
@@ -126,12 +126,19 @@ public class ServerClientHandler implements Runnable{
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_DIEROLL){
-                    String msg = client.getUserName() + "'s " + incoming.getMsg().trim();
+                    int roll =  (int) ((Math.random()*6)+1);
+                    String msg = client.getUserName() + "'s" + " die roll: " + roll;
                     broadcast(msg);
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_COINFLIP){
-                    String msg = client.getUserName() + "'s " + incoming.getMsg().trim();
+                    int rand = (int) ((Math.random()*2)+1);
+                    String msg = "";
+                    if(rand == 1) {
+                        msg = client.getUserName() + "'s " + "coin flip: Heads";
+                    } else if (rand == 2) {
+                        msg = client.getUserName() + "'s " + "coin flip: tails";
+                    }
                     broadcast(msg);
                 }
 
