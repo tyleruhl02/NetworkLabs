@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -64,8 +61,8 @@ class ServerInfo {
 
 public class ChatGuiClient extends Application {
     private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private static ObjectInputStream socketIn;
+    private static ObjectOutputStream out;
     
     private Stage stage;
     private TextArea messageArea;
@@ -129,9 +126,9 @@ public class ChatGuiClient extends Application {
         
         //Handle GUI closed event
         stage.setOnCloseRequest(e -> {
-            out.println("QUIT");
-            socketListener.appRunning = false;
             try {
+                out.writeObject(new Serialization(Serialization.MSG_HEADER_OTHER, "QUIT"));
+                socketListener.appRunning = false;
                 socket.close(); 
             } catch (IOException ex) {}
         });
@@ -140,11 +137,16 @@ public class ChatGuiClient extends Application {
     }
 
     private void sendMessage() {
-        String message = textInput.getText().trim();
-        if (message.length() == 0)
-            return;
-        textInput.clear();
-        out.println("CHAT " + message);
+        try {
+            String message = textInput.getText().trim();
+            if (message.length() == 0)
+                return;
+            textInput.clear();
+            out.writeObject(new Serialization(Serialization.MSG_HEADER_CHAT, (message)));
+        } catch(IOException ex){
+            System.out.println("Error");
+        }
+
     }
 
     private Optional<ServerInfo> getServerIpAndPort() {
@@ -238,21 +240,27 @@ public class ChatGuiClient extends Application {
             try {
                 // Set up the socket for the Gui
                 socket = new Socket(serverInfo.serverAddress, serverInfo.serverPort);
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new PrintWriter(socket.getOutputStream(), true);
+                socketIn = new ObjectInputStream(socket.getInputStream());
+                out = new ObjectOutputStream(socket.getOutputStream());
                 
                 appRunning = true;
                 //Ask the gui to show the username dialog and update username
                 //Send to the server
                 Platform.runLater(() -> {
-                    out.println(getName());
+                    try {
+                        out.writeObject(new Serialization(Serialization.MSG_HEADER_OTHER, getName()));
+                    } catch(IOException Exception){
+                        System.out.println("Error");
+                    }
+
                 });
 
+                Serialization incoming;
+
                 //handle all kinds of incoming messages
-                String incoming = "";
-                while (appRunning && (incoming = in.readLine()) != null) {
-                    if (incoming.startsWith("WELCOME")) {
-                        String user = incoming.substring(8);
+                while (appRunning && (incoming = (Serialization) socketIn.readObject()) != null) {
+                    if (incoming.getMsg().startsWith("WELCOME")) {
+                        String user = incoming.getMsg().substring(8);
                         //got welcomed? Now you can send messages!
                         if (user.equals(username)) {
                             Platform.runLater(() -> {
@@ -268,16 +276,15 @@ public class ChatGuiClient extends Application {
                             });
                         }
 
-                    } else if (incoming.startsWith("CHAT")) {
-                        int split = incoming.indexOf(" ", 5);
-                        String user = incoming.substring(5, split);
-                        String msg = incoming.substring(split + 1);
+                    } else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_CHAT) {
+                        String msg = incoming.getMsg();
+                        String finalMsg = msg.substring(0, msg.indexOf(" ")).trim() + ": " + msg.substring(msg.indexOf(" ")).trim();
 
                         Platform.runLater(() -> {
-                            messageArea.appendText(user + ": " + msg + "\n");
+                            messageArea.appendText(finalMsg + "\n");
                         });
-                    } else if (incoming.startsWith("EXIT")) {
-                        String user = incoming.substring(5);
+                    } else if (incoming.getMsg().startsWith("EXIT")) {
+                        String user = incoming.getMsg().substring(5);
                         Platform.runLater(() -> {
                             messageArea.appendText(user + "has left the chatroom.\n");
                         });

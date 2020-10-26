@@ -20,7 +20,7 @@ public class ClientServerHandler implements Runnable{
                 //EXIT
                 String msg = incoming.getMsg();
                 if(incoming.getMsgHeader() == Serialization.MSG_HEADER_CHAT) {
-                    msg = msg.substring(0, msg.indexOf(" ")).trim() + " says: " + msg.substring(msg.indexOf(" ")).trim();
+                    msg = msg.substring(0, msg.indexOf(" ")).trim() + ": " + msg.substring(msg.indexOf(" ")).trim();
                     System.out.println(msg);
                 }
 
@@ -29,7 +29,7 @@ public class ClientServerHandler implements Runnable{
                     msg = msg.substring(msg.indexOf(" ")).trim();
                     String secondUsername = msg.substring(0, msg.indexOf(" "));
                     msg = msg.substring(msg.indexOf(" ")).trim();
-                    System.out.println(firstUsername + " says to " + secondUsername + ": " + msg);
+                    System.out.println(firstUsername + " --> " + secondUsername + ": " + msg);
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_DIEROLL) {
