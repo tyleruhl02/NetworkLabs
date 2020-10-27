@@ -155,6 +155,9 @@ public class ChatGuiClient extends Application {
                 m = new Serialization(Serialization.MSG_HEADER_QUIT, "");
             } else {
                 m = new Serialization(Serialization.MSG_HEADER_CHAT, message);
+                Platform.runLater(() -> {
+                    messageArea.appendText(username + ": " + message + "\n");
+                });
             }
             out.writeObject(m);
         } catch(IOException ex){
