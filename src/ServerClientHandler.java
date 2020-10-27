@@ -24,8 +24,11 @@ public class ServerClientHandler implements Runnable{
             System.out.println("Broadcasting -- " + msg.getMsg());
             synchronized (clientList) {
                 for (ClientConnectionData c : clientList){
+                    /*
+                    if(c.getUserName() != null && client.getUserName() != c.getUserName()){
+                        c.getOut().writeObject(msg);
+                    }*/
                     c.getOut().writeObject(msg);
-                    // c.getOut().flush();
                 }
             }
         } catch (Exception ex) {
@@ -126,7 +129,7 @@ public class ServerClientHandler implements Runnable{
                                         System.out.println(chat);
                                         temp = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, String.format("%s %s %s", client.getUserName(), c.getUserName(), chat));
                                         privateBroadcast(temp, c);
-                                        privateBroadcast(temp, client);
+                                        //privateBroadcast(temp, client);
                                 }
                             }
                         }
