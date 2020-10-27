@@ -353,7 +353,14 @@ public class ChatGuiClient extends Application {
                     }
 
                     else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_INVALIDNAME) {
-                        out.writeObject(new Serialization(Serialization.MSG_HEADER_OTHER, getName(1)));
+                        Platform.runLater(() -> {
+                            try {
+                                out.writeObject(new Serialization(Serialization.MSG_HEADER_OTHER, getName(1)));
+                            } catch(IOException Exception){
+                                System.out.println("Error");
+                            }
+
+                        });
                     }
 
                     else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_OTHER){

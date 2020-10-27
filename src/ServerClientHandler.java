@@ -24,11 +24,19 @@ public class ServerClientHandler implements Runnable{
             System.out.println("Broadcasting -- " + msg);
             synchronized (clientList) {
                 for (ClientConnectionData c : clientList){
-                    /*
-                    if(c.getUserName() != null && client.getUserName() != c.getUserName()){
-                        c.getOut().writeObject(msg);
-                    }*/
-                    c.getOut().writeObject(msg);
+
+                    if(msg.getMsgHeader() == Serialization.MSG_HEADER_CHAT) {
+                        if (c.getUserName().length() != 0 && client.getUserName() != c.getUserName()) {
+                            c.getOut().writeObject(msg);
+                        }
+                    }
+                    else{
+                        if(c.getUserName().length() != 0) {
+                            c.getOut().writeObject(msg);
+                        }
+                    }
+
+
                 }
             }
         } catch (Exception ex) {
@@ -80,6 +88,7 @@ public class ServerClientHandler implements Runnable{
                         Serialization temp = new Serialization(Serialization.MSG_HEADER_INVALIDNAME, "Sorry that user name is either taken or invalid, please enter another username.");
                         privateBroadcast(temp, client);
                         userName = ((Serialization)in.readObject()).getMsg().trim();
+                        System.out.println(userName);
                         break;
                     }
 
