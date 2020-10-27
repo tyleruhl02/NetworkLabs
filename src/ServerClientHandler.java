@@ -158,6 +158,7 @@ public class ServerClientHandler implements Runnable{
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_QUIT){
+                    broadcast(new Serialization(Serialization.MSG_HEADER_QUIT, client.getUserName()));
                     break;
                 }
             }

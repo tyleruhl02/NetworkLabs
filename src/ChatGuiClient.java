@@ -142,7 +142,19 @@ public class ChatGuiClient extends Application {
             if (message.length() == 0)
                 return;
             textInput.clear();
-            out.writeObject(new Serialization(Serialization.MSG_HEADER_CHAT, (message)));
+            Serialization m;
+            if (message.startsWith("@")) {
+                m = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, message);
+            } else if(message.startsWith("/rolldie")) {
+                m = new Serialization(Serialization.MSG_HEADER_DIEROLL, message);
+            } else if(message.startsWith("/flipcoin"))  {
+                m = new Serialization(Serialization.MSG_HEADER_COINFLIP, message);
+            } else if(message.startsWith("/whoishere")) {
+                m = new Serialization(Serialization.MSG_HEADER_WHOISHERE, message);
+            } else {
+                m = new Serialization(Serialization.MSG_HEADER_CHAT, message);
+            }
+            out.writeObject(m);
         } catch(IOException ex){
             System.out.println("Error");
         }
@@ -283,10 +295,35 @@ public class ChatGuiClient extends Application {
                         Platform.runLater(() -> {
                             messageArea.appendText(finalMsg + "\n");
                         });
-                    } else if (incoming.getMsg().startsWith("EXIT")) {
-                        String user = incoming.getMsg().substring(5);
+                    }
+                    else if (incoming.getMsgHeader()==Serialization.MSG_HEADER_QUIT) {
+                        String user = incoming.getMsg();
                         Platform.runLater(() -> {
-                            messageArea.appendText(user + "has left the chatroom.\n");
+                            messageArea.appendText(user + " has left the server.\n");
+                        });
+                    }
+                    else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_WHOISHERE){
+                        String[] chat = incoming.getMsg().trim().split(" ");
+                        for (int i = 0; i < chat.length; i++){
+                            String msg = chat[i];
+                            Platform.runLater(() -> {
+                                messageArea.appendText(msg + "\n");
+                            });
+                        }
+                    }
+                    else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_PRIVATECHAT){
+
+                    }
+                    else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_COINFLIP){
+                        String msg = incoming.getMsg();
+                        Platform.runLater(() -> {
+                            messageArea.appendText(msg + "\n");
+                        });
+                    }
+                    else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_DIEROLL){
+                        String msg = incoming.getMsg();
+                        Platform.runLater(() -> {
+                            messageArea.appendText(msg + "\n");
                         });
                     }
                 }

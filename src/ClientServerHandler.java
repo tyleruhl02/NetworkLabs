@@ -51,6 +51,10 @@ public class ClientServerHandler implements Runnable{
                     System.out.println(msg);
                 }
 
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_QUIT){
+                    System.out.println(incoming.getMsg() + " has left the server.");
+                }
+
                 else {
                     System.out.println("Invalid Message Header.");
                 }
