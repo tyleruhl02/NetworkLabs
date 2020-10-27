@@ -21,7 +21,7 @@ public class ServerClientHandler implements Runnable{
      */
     public void broadcast(Serialization msg) {
         try {
-            System.out.println("Broadcasting -- " + msg.getMsg());
+            System.out.println("Broadcasting -- " + msg);
             synchronized (clientList) {
                 for (ClientConnectionData c : clientList){
                     /*
@@ -63,7 +63,7 @@ public class ServerClientHandler implements Runnable{
 
     @Override
     public void run() {
-        try {
+        exit: try {
             ObjectInputStream in = new ObjectInputStream(client.getSocket().getInputStream());
             //get userName, first message from user
             Serialization incoming;
@@ -77,7 +77,7 @@ public class ServerClientHandler implements Runnable{
                 for (int i = 0; i < clientList.size(); i++) {
                     if (clientList.get(i).getUserName().equals(userName) || !userName.matches("^[a-zA-Z0-9]*$")
                             || userName.length() == 0) {
-                        Serialization temp = new Serialization(Serialization.MSG_HEADER_OTHER, "Sorry that user name is either taken or invalid, please enter another username.");
+                        Serialization temp = new Serialization(Serialization.MSG_HEADER_INVALIDNAME, "Sorry that user name is either taken or invalid, please enter another username.");
                         privateBroadcast(temp, client);
                         userName = ((Serialization)in.readObject()).getMsg().trim();
                         break;
@@ -90,7 +90,7 @@ public class ServerClientHandler implements Runnable{
             }
             client.setUserName(userName);
             //notify all that client has joined
-            Serialization temp = new Serialization(Serialization.MSG_HEADER_OTHER, String.format("WELCOME %s", client.getUserName()));
+            Serialization temp = new Serialization(Serialization.MSG_HEADER_WELCOME, client.getUserName());
             broadcast(temp);
 
             whoIsHere(client);
@@ -124,10 +124,10 @@ public class ServerClientHandler implements Runnable{
 
                     for (ClientConnectionData c: clientList) {
                         for(int i = 0; i < pchatUsername.size(); i++) {
-                            if (pchatUsername.get(i).equals(c.getUserName())) {
+                            if (pchatUsername.get(i).equals(c.getUserName()) && !pchatUsername.get(i).equals(client.getUserName())) {
                                 if (chat.length() > 0) {
                                         System.out.println(chat);
-                                        temp = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, String.format("%s %s %s", client.getUserName(), c.getUserName(), chat));
+                                        temp = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, String.format("%s %s", client.getUserName(), chat));
                                         privateBroadcast(temp, c);
                                         //privateBroadcast(temp, client);
                                 }
@@ -158,8 +158,8 @@ public class ServerClientHandler implements Runnable{
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_QUIT){
-                    broadcast(new Serialization(Serialization.MSG_HEADER_QUIT, client.getUserName()));
-                    break;
+                    //broadcast(new Serialization(Serialization.MSG_HEADER_QUIT, client.getUserName()));
+                    break exit;
                 }
             }
         } catch (Exception ex) {
@@ -176,7 +176,7 @@ public class ServerClientHandler implements Runnable{
                 clientList.remove(client);
             }
             System.out.println(client.getName() + " has left.");
-            broadcast(new Serialization(Serialization.MSG_HEADER_CHAT, String.format("EXIT %s", client.getUserName())));
+            broadcast(new Serialization(Serialization.MSG_HEADER_QUIT, client.getUserName()));
             try {
                 client.getSocket().close();
             } catch (IOException ex) {}

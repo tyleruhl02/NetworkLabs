@@ -27,9 +27,9 @@ public class ClientServerHandler implements Runnable{
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_PRIVATECHAT) {
                     String firstUsername = msg.substring(0, msg.indexOf(" "));
                     msg = msg.substring(msg.indexOf(" ")).trim();
-                    String secondUsername = msg.substring(0, msg.indexOf(" "));
-                    msg = msg.substring(msg.indexOf(" ")).trim();
-                    System.out.println(firstUsername + " --> " + secondUsername + ": " + msg);
+                    //String secondUsername = msg.substring(0, msg.indexOf(" "));
+                    //msg = msg.substring(msg.indexOf(" ")).trim();
+                    System.out.println(firstUsername + " (privately): " + msg);
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_DIEROLL) {
@@ -49,6 +49,14 @@ public class ClientServerHandler implements Runnable{
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_OTHER) {
                     System.out.println(msg);
+                }
+
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_WELCOME) {
+                    System.out.println(msg + " has joined the server.");
+                }
+
+                else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_INVALIDNAME) {
+                    System.out.println(incoming.getMsg());
                 }
 
                 else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_QUIT){

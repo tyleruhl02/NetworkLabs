@@ -151,6 +151,8 @@ public class ChatGuiClient extends Application {
                 m = new Serialization(Serialization.MSG_HEADER_COINFLIP, message);
             } else if(message.startsWith("/whoishere")) {
                 m = new Serialization(Serialization.MSG_HEADER_WHOISHERE, message);
+            } else if (message.startsWith("/quit")){
+                m = new Serialization(Serialization.MSG_HEADER_QUIT, "");
             } else {
                 m = new Serialization(Serialization.MSG_HEADER_CHAT, message);
             }
@@ -226,10 +228,15 @@ public class ChatGuiClient extends Application {
         return getServerDialog.showAndWait();
     }
 
-    private String getName(){
+    private String getName(int prompt){
         TextInputDialog nameDialog = new TextInputDialog();
         nameDialog.setTitle("Enter Chat Name");
-        nameDialog.setHeaderText("Please enter your username.");
+        if(prompt == 0){
+            nameDialog.setHeaderText("Please enter your username.");
+        }
+        else if (prompt == 1) {
+            nameDialog.setHeaderText("That username was taken. Enter a different username.");
+        }
         nameDialog.setContentText("Name: ");
         
         while(username.equals("")) {
@@ -237,7 +244,10 @@ public class ChatGuiClient extends Application {
             if (!name.isPresent() || name.get().trim().equals(""))
                 nameDialog.setHeaderText("You must enter a nonempty name: ");
             else if (name.get().trim().contains(" "))
-                nameDialog.setHeaderText("The name must have no spaces: ");
+                nameDialog.setHeaderText("Your name must have no spaces: ");
+            else if (!name.get().trim().matches("^[a-zA-Z0-9]*$")){
+                nameDialog.setHeaderText("Your name must have only alphanumeric characters: ");
+            }
             else
             username = name.get().trim();            
         }
@@ -249,7 +259,7 @@ public class ChatGuiClient extends Application {
         volatile boolean appRunning = false;
 
         public void run() {
-            try {
+            exit: try {
                 // Set up the socket for the Gui
                 socket = new Socket(serverInfo.serverAddress, serverInfo.serverPort);
                 socketIn = new ObjectInputStream(socket.getInputStream());
@@ -260,7 +270,7 @@ public class ChatGuiClient extends Application {
                 //Send to the server
                 Platform.runLater(() -> {
                     try {
-                        out.writeObject(new Serialization(Serialization.MSG_HEADER_OTHER, getName()));
+                        out.writeObject(new Serialization(Serialization.MSG_HEADER_OTHER, getName(0)));
                     } catch(IOException Exception){
                         System.out.println("Error");
                     }
@@ -271,20 +281,20 @@ public class ChatGuiClient extends Application {
 
                 //handle all kinds of incoming messages
                 while (appRunning && (incoming = (Serialization) socketIn.readObject()) != null) {
-                    if (incoming.getMsg().startsWith("WELCOME")) {
-                        String user = incoming.getMsg().substring(8);
+                    if (incoming.getMsgHeader() == Serialization.MSG_HEADER_WELCOME) {
+                        String user = incoming.getMsg();
                         //got welcomed? Now you can send messages!
                         if (user.equals(username)) {
                             Platform.runLater(() -> {
                                 stage.setTitle("Chatter - " + username);
                                 textInput.setEditable(true);
                                 sendButton.setDisable(false);
-                                messageArea.appendText("Welcome to the chatroom, " + username + "!\n");
+                                messageArea.appendText(username + " has joined the server." + "\n");
                             });
                         }
                         else {
                             Platform.runLater(() -> {
-                                messageArea.appendText(user + " has joined the chatroom.\n");
+                                messageArea.appendText(user + " has joined the server.\n");
                             });
                         }
 
@@ -312,7 +322,14 @@ public class ChatGuiClient extends Application {
                         }
                     }
                     else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_PRIVATECHAT){
-
+                        String msg = incoming.getMsg();
+                        String firstUsername = msg.substring(0, msg.indexOf(" "));
+                        String finalMsg = msg.substring(msg.indexOf(" ")).trim();
+                        //String secondUsername = msg.substring(0, msg.indexOf(" "));
+                        //msg = msg.substring(msg.indexOf(" ")).trim();
+                        Platform.runLater(() -> {
+                            messageArea.appendText(firstUsername + " (privately): " + finalMsg + "\n");
+                        });
                     }
                     else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_COINFLIP){
                         String msg = incoming.getMsg();
@@ -321,6 +338,25 @@ public class ChatGuiClient extends Application {
                         });
                     }
                     else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_DIEROLL){
+                        String msg = incoming.getMsg();
+                        Platform.runLater(() -> {
+                            messageArea.appendText(msg + "\n");
+                        });
+                    }
+
+                    else if (incoming.getMsgHeader()==Serialization.MSG_HEADER_QUIT) {
+                        String user = incoming.getMsg();
+                        Platform.runLater(() -> {
+                            messageArea.appendText(user + " has left the server." + "\n");
+                        });
+                        break exit;
+                    }
+
+                    else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_INVALIDNAME) {
+                        out.writeObject(new Serialization(Serialization.MSG_HEADER_OTHER, getName(1)));
+                    }
+
+                    else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_OTHER){
                         String msg = incoming.getMsg();
                         Platform.runLater(() -> {
                             messageArea.appendText(msg + "\n");
