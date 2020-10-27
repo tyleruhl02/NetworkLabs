@@ -230,6 +230,7 @@ public class ChatGuiClient extends Application {
 
     private String getName(int prompt){
         TextInputDialog nameDialog = new TextInputDialog();
+        username = "";
         nameDialog.setTitle("Enter Chat Name");
         if(prompt == 0){
             nameDialog.setHeaderText("Please enter your username.");
