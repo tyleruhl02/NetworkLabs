@@ -145,6 +145,11 @@ public class ChatGuiClient extends Application {
             Serialization m;
             if (message.startsWith("@")) {
                 m = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, message);
+                String name = message.substring(1, message.indexOf(" "));
+                String msg = message.substring(message.indexOf(" "));
+                Platform.runLater(() -> {
+                    messageArea.appendText("To  " + name + "(privately): " + msg + "\n");
+                });
             } else if(message.startsWith("/rolldie")) {
                 m = new Serialization(Serialization.MSG_HEADER_DIEROLL, message);
             } else if(message.startsWith("/flipcoin"))  {

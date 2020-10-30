@@ -8,7 +8,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChatServer {
-    public static final int PORT = 54321;
+    //public static final int PORT = 54321;
+    // IP Address: ec2-13-58-169-82.us-east-2.compute.amazonaws.com
+    public static final int PORT = 59005;
     private static final ArrayList<ClientConnectionData> clientList = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
