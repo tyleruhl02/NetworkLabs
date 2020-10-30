@@ -148,7 +148,7 @@ public class ChatGuiClient extends Application {
                 String name = message.substring(1, message.indexOf(" "));
                 String msg = message.substring(message.indexOf(" "));
                 Platform.runLater(() -> {
-                    messageArea.appendText("To  " + name + "(privately): " + msg + "\n");
+                    messageArea.appendText("To  " + name + " (privately): " + msg + "\n");
                 });
             } else if(message.startsWith("/rolldie")) {
                 m = new Serialization(Serialization.MSG_HEADER_DIEROLL, message);
