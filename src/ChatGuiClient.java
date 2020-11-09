@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,6 +69,9 @@ public class ChatGuiClient extends Application {
     private TextArea messageArea;
     private TextField textInput;
     private Button sendButton;
+    private Button coinflipButton;
+    private Button rolldieButton;
+    private TextArea userList;
 
     private ServerInfo serverInfo;
     //volatile keyword makes individual reads/writes of the variable atomic
@@ -104,6 +108,12 @@ public class ChatGuiClient extends Application {
         messageArea.setEditable(false);
         borderPane.setCenter(messageArea);
 
+        userList = new TextArea();
+        userList.setWrapText(true);
+        userList.setEditable(false);
+        borderPane.setTop(userList);
+        //userList.appendText("TEST");
+
         //At first, can't send messages - wait for WELCOME!
         textInput = new TextField();
         textInput.setEditable(false);
@@ -112,8 +122,16 @@ public class ChatGuiClient extends Application {
         sendButton.setDisable(true);
         sendButton.setOnAction(e -> sendMessage());
 
+        coinflipButton = new Button("Flip Coin");
+        coinflipButton.setDisable(true);
+        coinflipButton.setOnAction(e -> flipcoin());
+
+        rolldieButton = new Button("Roll Die");
+        rolldieButton.setDisable(true);
+        rolldieButton.setOnAction(e -> rolldie());
+
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(new Label("Message: "), textInput, sendButton);
+        hbox.getChildren().addAll(new Label("Message: "), textInput, sendButton, coinflipButton, rolldieButton);
         HBox.setHgrow(textInput, Priority.ALWAYS);
         borderPane.setBottom(hbox);
 
@@ -136,6 +154,24 @@ public class ChatGuiClient extends Application {
         new Thread(socketListener).start();
     }
 
+    private void flipcoin() {
+        try{
+            Serialization m = new Serialization(Serialization.MSG_HEADER_COINFLIP, "/flipcoin");
+            out.writeObject(m);
+        } catch(IOException ex) {
+            System.out.println("Error");
+        }
+    }
+
+    private void rolldie() {
+        try{
+            Serialization m = new Serialization(Serialization.MSG_HEADER_DIEROLL, "/rolldie");
+            out.writeObject(m);
+        } catch(IOException ex) {
+            System.out.println("Error");
+        }
+    }
+
     private void sendMessage() {
         try {
             String message = textInput.getText().trim();
@@ -145,11 +181,28 @@ public class ChatGuiClient extends Application {
             Serialization m;
             if (message.startsWith("@")) {
                 m = new Serialization(Serialization.MSG_HEADER_PRIVATECHAT, message);
-                String name = message.substring(1, message.indexOf(" "));
-                String msg = message.substring(message.indexOf(" "));
-                Platform.runLater(() -> {
-                    messageArea.appendText("To  " + name + " (privately): " + msg + "\n");
-                });
+
+                int endOfUsernameIndex = message.indexOf(" ");
+
+                ArrayList<String> pchatUsername = new ArrayList<String>();
+                pchatUsername.add(message.substring(1, endOfUsernameIndex).trim());
+                String tempMes = message.substring(endOfUsernameIndex).trim();
+
+                while(tempMes.startsWith("@")){
+                    endOfUsernameIndex = tempMes.indexOf(" ");
+                    pchatUsername.add(tempMes.substring(1, endOfUsernameIndex));
+                    tempMes = tempMes.substring(endOfUsernameIndex).trim();
+                }
+
+                String msg = tempMes;
+
+                for(int i = 0; i < pchatUsername.size(); i++){
+                    String name = pchatUsername.get(i);
+                    Platform.runLater(() -> {
+                        messageArea.appendText("To  " + name + " (privately): " + msg + "\n");
+                    });
+                }
+
             } else if(message.startsWith("/rolldie")) {
                 m = new Serialization(Serialization.MSG_HEADER_DIEROLL, message);
             } else if(message.startsWith("/flipcoin"))  {
@@ -298,6 +351,8 @@ public class ChatGuiClient extends Application {
                                 stage.setTitle("Chatter - " + username);
                                 textInput.setEditable(true);
                                 sendButton.setDisable(false);
+                                coinflipButton.setDisable(false);
+                                rolldieButton.setDisable(false);
                                 messageArea.appendText(username + " has joined the server." + "\n");
                             });
                         }
@@ -329,6 +384,14 @@ public class ChatGuiClient extends Application {
                                 messageArea.appendText(msg + "\n");
                             });
                         }
+                    }
+                    else if (incoming.getMsgHeader() == Serialization.MSG_HEADER_USERLIST) {
+                        String msg = incoming.getMsg();
+                        Platform.runLater(() -> {
+                            userList.clear();
+                            userList.appendText("USERS IN SERVER:\n");
+                            userList.appendText(msg);
+                        });
                     }
                     else if(incoming.getMsgHeader()==Serialization.MSG_HEADER_PRIVATECHAT){
                         String msg = incoming.getMsg();

@@ -69,6 +69,18 @@ public class ServerClientHandler implements Runnable{
         privateBroadcast(temp, client);
     }
 
+    public String arrayListToString(ArrayList<ClientConnectionData> clientList) {
+        String ret = "";
+        for(int i = 0; i < clientList.size(); i++) {
+            if(clientList.get(i).getUserName() == null){
+                continue;
+            }
+            ret += clientList.get(i).getUserName() + "\n";
+        }
+
+        return ret;
+    }
+
     @Override
     public void run() {
         exit: try {
@@ -101,6 +113,7 @@ public class ServerClientHandler implements Runnable{
             //notify all that client has joined
             Serialization temp = new Serialization(Serialization.MSG_HEADER_WELCOME, client.getUserName());
             broadcast(temp);
+            broadcast(new Serialization(Serialization.MSG_HEADER_USERLIST, arrayListToString(clientList)));
 
             whoIsHere(client);
             //incoming = (Serialization) in.readObject();
@@ -186,6 +199,7 @@ public class ServerClientHandler implements Runnable{
             }
             System.out.println(client.getName() + " has left.");
             broadcast(new Serialization(Serialization.MSG_HEADER_QUIT, client.getUserName()));
+            broadcast(new Serialization(Serialization.MSG_HEADER_USERLIST, arrayListToString(clientList)));
             try {
                 client.getSocket().close();
             } catch (IOException ex) {}

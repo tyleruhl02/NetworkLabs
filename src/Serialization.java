@@ -12,6 +12,7 @@ public class Serialization implements Serializable {
     public static final int MSG_HEADER_OTHER = 6;
     public static final int MSG_HEADER_WELCOME = 7;
     public static final int MSG_HEADER_INVALIDNAME = 8;
+    public static final int MSG_HEADER_USERLIST = 9;
 
     private int msgHeader;
     private String msg;
